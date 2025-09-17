@@ -1,5 +1,5 @@
 resource "aws_iam_role" "sie" {
-  name               = "SIE"
+  name = "SIE"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -21,8 +21,6 @@ resource "aws_iam_role" "sie" {
     "arn:${data.aws_partition.current.partition}:iam::aws:policy/ReadOnlyAccess"
   ]
 }
-
-data "aws_partition" "current" {}
 
 output "billing_software_role_arn" {
   description = "ARN of the IAM Role"

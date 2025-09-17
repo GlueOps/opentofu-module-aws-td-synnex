@@ -22,8 +22,6 @@ resource "aws_iam_role" "cloudanalyst" {
   ]
 }
 
-data "aws_partition" "current" {}
-
 output "cloudanalyst_role_arn" {
   description = "ARN of the IAM Role"
   value       = aws_iam_role.cloudanalyst.arn
