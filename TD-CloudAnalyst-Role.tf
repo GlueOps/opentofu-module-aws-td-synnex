@@ -14,12 +14,25 @@ resource "aws_iam_role" "cloudanalyst" {
     ]
   })
 
-  managed_policy_arns = [
-    "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSOrganizationsReadOnlyAccess",
-    "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSSupportAccess",
-    "arn:${data.aws_partition.current.partition}:iam::aws:policy/job-function/Billing",
-    "arn:${data.aws_partition.current.partition}:iam::aws:policy/IAMUserChangePassword"
-  ]
+  resource "aws_iam_role_policy_attachment" "cloudanalyst_org_readonly" {
+    role       = aws_iam_role.cloudanalyst.name
+    policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSOrganizationsReadOnlyAccess"
+  }
+
+  resource "aws_iam_role_policy_attachment" "cloudanalyst_support_access" {
+    role       = aws_iam_role.cloudanalyst.name
+    policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSSupportAccess"
+  }
+
+  resource "aws_iam_role_policy_attachment" "cloudanalyst_billing" {
+    role       = aws_iam_role.cloudanalyst.name
+    policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/job-function/Billing"
+  }
+
+  resource "aws_iam_role_policy_attachment" "cloudanalyst_change_password" {
+    role       = aws_iam_role.cloudanalyst.name
+    policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/IAMUserChangePassword"
+  }
 }
 
 output "cloudanalyst_role_arn" {
