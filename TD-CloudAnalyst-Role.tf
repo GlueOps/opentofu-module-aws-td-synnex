@@ -15,10 +15,10 @@ resource "aws_iam_role" "cloudanalyst" {
   })
 
   managed_policy_arns = [
-    "arn:aws:iam::aws:policy/AWSOrganizationsReadOnlyAccess",
-    "arn:aws:iam::aws:policy/AWSSupportAccess",
-    "arn:aws:iam::aws:policy/job-function/Billing",
-    "arn:aws:iam::aws:policy/IAMUserChangePassword"
+    "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSOrganizationsReadOnlyAccess",
+    "arn:${data.aws_partition.current.partition}:iam::aws:policy/AWSSupportAccess",
+    "arn:${data.aws_partition.current.partition}:iam::aws:policy/job-function/Billing",
+    "arn:${data.aws_partition.current.partition}:iam::aws:policy/IAMUserChangePassword"
   ]
 }
 
