@@ -1,11 +1,6 @@
 resource "aws_s3_bucket" "hourly_cur" {
   bucket = "${data.aws_caller_identity.current.account_id}-hourly-cur"
 
-
-
-
-
-
   lifecycle {
     prevent_destroy = true
   }
