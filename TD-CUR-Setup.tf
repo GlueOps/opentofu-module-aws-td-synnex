@@ -1,17 +1,22 @@
 resource "aws_s3_bucket" "hourly_cur" {
   bucket = "${data.aws_caller_identity.current.account_id}-hourly-cur"
 
-  ownership_controls {
-    rule {
-      object_ownership = "BucketOwnerEnforced"
-    }
-  }
+
+
+
+
 
   lifecycle {
     prevent_destroy = true
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "hourly_cur" {
+  bucket = aws_s3_bucket.hourly_cur.id
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
 resource "aws_s3_bucket_public_access_block" "hourly_cur" {
   bucket = aws_s3_bucket.hourly_cur.id
 
