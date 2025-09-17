@@ -17,9 +17,11 @@ resource "aws_iam_role" "sie" {
       }
     ]
   })
-  managed_policy_arns = [
-    "arn:${data.aws_partition.current.partition}:iam::aws:policy/ReadOnlyAccess"
-  ]
+}
+
+resource "aws_iam_role_policy_attachment" "sie_readonly_access" {
+  role       = aws_iam_role.sie.name
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/ReadOnlyAccess"
 }
 
 output "billing_software_role_arn" {
