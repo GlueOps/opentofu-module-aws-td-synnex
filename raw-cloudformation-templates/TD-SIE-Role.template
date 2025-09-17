@@ -1,0 +1,49 @@
+#https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?stackName=TD-SIE-Role-Stack&templateURL=https%3A%2F%2Ftd-cloudops-resources.s3.amazonaws.com%2FTD-SIE-Role.template
+#https://td-cloudops-resources.s3.amazonaws.com/TD-SIE-Role.template
+
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+    - Label:
+        Default: 'TD SIE Stack'
+      Parameters:
+        - ExternalAccount
+Parameters:
+  ExternalAccount:
+    Type: String
+    Default: '328676173091'
+    Description: External Account
+  ExternalId:
+    Type: String
+    Description: External Id
+Resources:
+  IamRole:
+    Type: 'AWS::IAM::Role'
+    DeletionPolicy: Retain
+    Properties:
+      RoleName: SIE
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS: !Sub 'arn:${AWS::Partition}:iam::${ExternalAccount}:root'
+          Action: 'sts:AssumeRole'
+          Condition:
+            StringEquals:
+              sts:ExternalId:
+                Ref: ExternalId
+      ManagedPolicyArns:
+        - !Sub "arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess"
+Outputs:
+  BillingSoftwareRoleArn:
+    Description: ARN of the IAM Role
+    Value: !GetAtt
+      - IamRole
+      - Arn
+  BillingSoftwareRoleId:
+    Description: Id of the IAM Role
+    Value: !GetAtt
+      - IamRole
+      - RoleId
