@@ -5,7 +5,7 @@
 
 OpenTofu Module to bootstrap TD Synnex (https://www.tdsynnex.com) access to AWS Root Organizations.
 
-Original cloudformation templates provided by TD Synnex can be found here within `cloudformat-templates/` folder
+Original cloudformation templates provided by TD Synnex can be found here within `raw-cloudformation-templates/` folder
 
 ## Requirements
 
