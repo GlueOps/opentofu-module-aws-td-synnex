@@ -1,5 +1,10 @@
+locals {
+  s3_region = "us-east-1"
+}
+
 resource "aws_s3_bucket" "hourly_cur" {
   bucket = "${data.aws_caller_identity.current.account_id}-hourly-cur"
+  region = local.s3_region
 
   lifecycle {
     prevent_destroy = true
@@ -43,7 +48,7 @@ resource "aws_s3_bucket_policy" "hourly_cur_policy" {
         Resource  = aws_s3_bucket.hourly_cur.arn,
         Condition = {
           StringEquals = {
-            "aws:SourceArn"     = "arn:aws:cur:us-east-1:${data.aws_caller_identity.current.account_id}:definition/*",
+            "aws:SourceArn"     = "arn:aws:cur:${local.s3_region}:${data.aws_caller_identity.current.account_id}:definition/*",
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
@@ -56,7 +61,7 @@ resource "aws_s3_bucket_policy" "hourly_cur_policy" {
         Resource  = "${aws_s3_bucket.hourly_cur.arn}/*",
         Condition = {
           StringEquals = {
-            "aws:SourceArn"     = "arn:aws:cur:us-east-1:${data.aws_caller_identity.current.account_id}:definition/*",
+            "aws:SourceArn"     = "arn:aws:cur:${local.s3_region}:${data.aws_caller_identity.current.account_id}:definition/*",
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id
           }
         }
@@ -73,7 +78,7 @@ resource "aws_cur_report_definition" "hourly_cur" {
   additional_schema_elements = ["RESOURCES"]
   s3_bucket                  = aws_s3_bucket.hourly_cur.bucket
   s3_prefix                  = "CUR"
-  s3_region                  = "us-east-1"
+  s3_region                  = local.s3_region
   additional_artifacts       = ["QUICKSIGHT"]
   refresh_closed_reports     = true
   report_versioning          = "CREATE_NEW_REPORT"
