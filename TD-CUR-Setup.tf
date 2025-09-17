@@ -7,20 +7,18 @@ resource "aws_s3_bucket" "hourly_cur" {
     }
   }
 
-  acl = "private"
-
-  public_access_block {
-    block_public_acls       = true
-    block_public_policy     = true
-    ignore_public_acls      = true
-    restrict_public_buckets = true
-  }
-
-
-
   lifecycle {
     prevent_destroy = true
   }
+}
+
+resource "aws_s3_bucket_public_access_block" "hourly_cur" {
+  bucket = aws_s3_bucket.hourly_cur.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "hourly_cur_sse" {
