@@ -1,0 +1,92 @@
+#https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?stackName=TD-CUR-Stack&templateURL=https%3A%2F%2Ftd-cloudops-resources.s3.amazonaws.com%2FTD-CUR-Setup.template
+#https://td-cloudops-resources.s3.amazonaws.com/TD-CUR-Setup.template
+
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  HourlyCURS3:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties: 
+      BucketName: !Sub
+        - "${acct}-hourly-cur"
+        - acct: !Ref "AWS::AccountId"
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+  HourlyCURS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: Retain
+    DependsOn: HourlyCURS3
+    Properties:
+      Bucket: !Sub
+        - "${acct}-hourly-cur"
+        - acct: !Ref "AWS::AccountId"
+      PolicyDocument:
+        Version: '2008-10-17'
+        Id: Policy1335892530063
+        Statement:
+        - Sid: Stmt1335892150622
+          Effect: Allow
+          Principal:
+            Service: billingreports.amazonaws.com
+          Action:
+          - s3:GetBucketAcl
+          - s3:GetBucketPolicy
+          Resource: !Sub
+            - "arn:aws:s3:::${acct}-hourly-cur"
+            - acct: !Ref "AWS::AccountId"
+          Condition:
+            StringEquals:
+              aws:SourceArn: !Sub
+                - "arn:aws:cur:us-east-1:${acct}:definition/*"
+                - acct: !Ref "AWS::AccountId"
+              aws:SourceAccount: !Sub
+                - '${acct}'
+                - acct: !Ref "AWS::AccountId"
+        - Sid: Stmt1335892526596
+          Effect: Allow
+          Principal:
+            Service: billingreports.amazonaws.com
+          Action:
+          - s3:PutObject
+          Resource: !Sub
+            - "arn:aws:s3:::${acct}-hourly-cur/*"
+            - acct: !Ref "AWS::AccountId"
+          Condition:
+            StringEquals:
+              aws:SourceArn: !Sub
+                - "arn:aws:cur:us-east-1:${acct}:definition/*"
+                - acct: !Ref "AWS::AccountId"
+              aws:SourceAccount: !Sub
+                - '${acct}'
+                - acct: !Ref "AWS::AccountId"
+  HourlyCUR:
+    Type: AWS::CUR::ReportDefinition
+    DeletionPolicy: Retain
+    DependsOn: 
+      - HourlyCURS3
+      - HourlyCURS3BucketPolicy    
+    Properties:
+      AdditionalArtifacts: 
+        - QUICKSIGHT
+      AdditionalSchemaElements: 
+        - RESOURCES
+      Compression: GZIP
+      Format: textORcsv
+      RefreshClosedReports: true
+      ReportName: !Join ['',['', !Ref "AWS::AccountId", '-hourly-cur']]
+      ReportVersioning: CREATE_NEW_REPORT
+      S3Bucket: !Join ['',['', !Ref "AWS::AccountId", '-hourly-cur']]
+      S3Prefix: CUR
+      S3Region: us-east-1
+      TimeUnit: HOURLY

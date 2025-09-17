@@ -1,0 +1,45 @@
+#https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review?stackName=TD-CloudAnalyst-Stack&templateURL=https%3A%2F%2Ftd-cloudops-resources.s3.amazonaws.com%2FTD-CloudAnalyst-Role.template
+#https://td-cloudops-resources.s3.amazonaws.com/TD-CloudAnalyst-Role.template
+
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: TD CloudAnalyst IAM Role
+        Parameters:
+          - ExternalAccount
+  'AWS::CloudFormation::Designer': {}
+Parameters:
+  ExternalAccount:
+    Type: String
+    Default: '687056495944'
+    Description: TD CloudOps Account
+Resources:
+  IamRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: TD-CloudAnalyst-Role
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AWSOrganizationsReadOnlyAccess'
+        - 'arn:aws:iam::aws:policy/AWSSupportAccess'
+        - 'arn:aws:iam::aws:policy/job-function/Billing'
+        - 'arn:aws:iam::aws:policy/IAMUserChangePassword'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:${AWS::Partition}:iam::${ExternalAccount}:root'
+            Action: 'sts:AssumeRole'
+Outputs:
+  RoleArn:
+    Description: ARN of the IAM Role
+    Value: !GetAtt 
+      - IamRole
+      - Arn
+  RoleId:
+    Description: Id of the IAM Role
+    Value: !GetAtt 
+      - IamRole
+      - RoleId
